@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+import os
+import sys
+import application
+from termcolor import colored
+import nltk
+
+import helpers
+from analyzer import Analyzer
+# TODO
+def main():
+    if len(sys.argv) != 2:
+        sys.exit("Usage: ./tweets word")
+    # absolute paths to lists
+    positives = os.path.join(sys.path[0], "positive-words.txt")
+    negatives = os.path.join(sys.path[0], "negative-words.txt")
+
+    # instantiate analyzer
+    analyzer = Analyzer(positives, negatives)
+
+
+
+    #tweets="I love you"
+    tknzr=nltk.tokenize.TweetTokenizer()
+
+    tweets=helpers.get_user_timeline(sys.argv[1],50)
+    for j in range(len(tweets)):
+        tokens=tknzr.tokenize(tweets[j])
+
+        #print(tokens[0])
+        # analyze word
+        #print(len(tokens))
+        total=0
+        for i in range(len(tokens)):
+
+            scores=analyzer.analyze(tokens[i])
+            total=total+scores
+        if total > 0.0:
+            print(colored(total,"green"),end=" ")
+            print(colored(tweets[j],"green"))
+        elif total < 0.0:
+            print(colored(total,"red"),end=" ")
+            print(colored(tweets[j],"red"))
+        else:
+            #print(colored(":|", "yellow"))
+            print(colored(total,"yellow"),end=" ")
+            print(colored(tweets[j],"yellow"))
+
+
+if __name__ == "__main__":
+    main()
